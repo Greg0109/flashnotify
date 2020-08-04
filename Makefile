@@ -10,3 +10,5 @@ FlashNotify_PRIVATE_FRAMEWORKS = BulletinBoard
 FlashNotify_CFLAGS = -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/tweak.mk
+SUBPROJECTS += flashnotify
+include $(THEOS_MAKE_PATH)/aggregate.mk

@@ -7,10 +7,12 @@ static NSString *const kFlashNotifyBulletinAction = @"!com.greg0109.FlashNotify-
 PCSimpleTimer *timer;
 BBServer *server;
 
-static BOOL notifyWhileUnplugged = YES;
-static NSInteger unpluggedNotificationDelay;
-static BOOL notifyWhileCharging = YES;
-static NSInteger chargingNotificationDelay;
+BOOL enabled;
+NSInteger remind;
+BOOL charging;
+NSInteger remindCharging;
+BOOL autooff;
+NSInteger autooffTimer;
 
 static void removeBulletin() {
   if(server) {
@@ -21,35 +23,42 @@ static void removeBulletin() {
 }
 
 static void sendNotif() {
-  BBBulletinRequest *bulletin = [[BBBulletinRequest alloc] init];
-  bulletin.header = @"FLASHNOTIFY";
-  bulletin.title = @"Your flashlight is still on";
-  bulletin.message = @"Would you like to turn it off?";
-  bulletin.sectionID = @"com.apple.Preferences";
-  bulletin.bulletinID = [[NSProcessInfo processInfo] globallyUniqueString];
-  bulletin.recordID = [[NSProcessInfo processInfo] globallyUniqueString];
-  bulletin.publisherBulletinID = kFlashNotifyBulletinID;
-  bulletin.turnsOnDisplay = YES;
-  bulletin.lockScreenPriority = 3;
-  bulletin.preventAutomaticRemovalFromLockScreen = YES;
+  if (!autooff && remind) {
+    BBBulletinRequest *bulletin = [[BBBulletinRequest alloc] init];
+    bulletin.header = @"FLASHNOTIFY";
+    bulletin.title = @"Your flashlight is still on";
+    bulletin.message = @"Would you like to turn it off?";
+    bulletin.sectionID = @"com.apple.Preferences";
+    bulletin.bulletinID = [[NSProcessInfo processInfo] globallyUniqueString];
+    bulletin.recordID = [[NSProcessInfo processInfo] globallyUniqueString];
+    bulletin.publisherBulletinID = kFlashNotifyBulletinID;
+    bulletin.turnsOnDisplay = YES;
+    bulletin.lockScreenPriority = 3;
+    bulletin.preventAutomaticRemovalFromLockScreen = YES;
 
-  BBAction *disableFlashlight = [BBAction actionWithIdentifier:kFlashNotifyBulletinAction];
-  bulletin.defaultAction = disableFlashlight;
+    BBAction *disableFlashlight = [BBAction actionWithIdentifier:kFlashNotifyBulletinAction];
+    bulletin.defaultAction = disableFlashlight;
 
-  if(server) {
-    dispatch_async(__BBServerQueue, ^{
-      [server publishBulletinRequest:bulletin destinations:15];
-    });
+    if(server) {
+      dispatch_async(__BBServerQueue, ^{
+        [server publishBulletinRequest:bulletin destinations:15];
+      });
+    }
+  } else {
+    SBUIFlashlightController *flashlightController = [%c(SBUIFlashlightController) sharedInstance];
+    if (flashlightController.level > 0) {
+      [flashlightController setLevel:0];
+    }
   }
 }
 
-static void startTimer() {
+static void startTimer(NSInteger timeInterval) {
   if(timer) {
     [timer invalidate];
     timer = nil;
   }
   id selectorBlock = [^{sendNotif();} copy];
-  NSInteger timeInterval = ([UIDevice currentDevice].batteryState == 2 && notifyWhileCharging) ? chargingNotificationDelay : unpluggedNotificationDelay;
+  //NSInteger timeInterval = ([UIDevice currentDevice].batteryState == 2 && notifyWhileCharging) ? chargingNotificationDelay : unpluggedNotificationDelay;
   timer = [[%c(PCSimpleTimer) alloc] initWithTimeInterval:timeInterval serviceIdentifier:kFlashNotifyBulletinID target:selectorBlock selector:@selector(invoke) userInfo:nil];
   timer.disableSystemWaking = NO;
   [timer scheduleInRunLoop:[NSRunLoop mainRunLoop]];
@@ -62,16 +71,25 @@ static void stopTimer() {
   }
 }
 
-%hook SBUIFlashlightController
--(instancetype)init {
-  [[UIDevice currentDevice] setBatteryMonitoringEnabled:YES];
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(batteryStateChanged:) name:UIDeviceBatteryStateDidChangeNotification object:nil];
-
-  return %orig;
+%hook SBUIController
+-(void)playChargingChimeIfAppropriate {
+  if (charging) {
+    SBUIFlashlightController *flashlightController = [%c(SBUIFlashlightController) sharedInstance];
+  	if (self.isConnectedToExternalChargingSource && !self.isBatteryCharging && flashlightController.level > 0) {
+      startTimer(remindCharging);
+  	}
+  }
+  %orig;
 }
+%end
 
+%hook SBUIFlashlightController
 -(void)turnFlashlightOnForReason:(id)arg1 {
-  startTimer();
+  if (!autooff) {
+    startTimer(remind);
+  } else {
+    startTimer(autooffTimer);
+  }
   %orig;
 }
 
@@ -100,3 +118,16 @@ static void stopTimer() {
   return %orig;
 }
 %end
+
+%ctor {
+  NSMutableDictionary *prefs = [NSMutableDictionary dictionaryWithContentsOfFile:@"/User/Library/Preferences/com.greg0109.flashnotifyprefs.plist"];
+  enabled = prefs[@"enabled"] ? [prefs[@"enabled"] boolValue] : YES;
+  remind = prefs[@"remind"] ? [prefs[@"remind"] integerValue] : 120;
+  charging = prefs[@"charging"] ? [prefs[@"charging"] boolValue] : YES;
+  remindCharging = prefs[@"remindCharging"] ? [prefs[@"remindCharging"] integerValue] : 30;
+  autooff = prefs[@"autooff"] ? [prefs[@"autooff"] boolValue] : NO;
+  autooffTimer = prefs[@"autooffTimer"] ? [prefs[@"autooffTimer"] integerValue] : 30;
+  if (enabled) {
+    %init();
+  }
+}

@@ -78,3 +78,8 @@
 -(void)publishBulletinRequest:(BBBulletinRequest *)arg1 destinations:(unsigned long long)arg2;
 -(void)withdrawBulletinRequestsWithPublisherBulletinID:(NSString *)arg1 forSectionID:(NSString *)arg2;
 @end
+
+@interface SBUIController
+-(BOOL)isBatteryCharging;
+-(BOOL)isConnectedToExternalChargingSource;
+@end
