@@ -80,6 +80,7 @@
 @end
 
 @interface SBUIController
++(id)sharedInstance;
 -(BOOL)isBatteryCharging;
 -(BOOL)isConnectedToExternalChargingSource;
 @end

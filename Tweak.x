@@ -85,10 +85,14 @@ static void stopTimer() {
 
 %hook SBUIFlashlightController
 -(void)turnFlashlightOnForReason:(id)arg1 {
+  SBUIController *controller = [%c(SBUIController) sharedInstance];
   if (!autooff) {
     startTimer(remind);
   } else {
     startTimer(autooffTimer);
+  }
+  if (charging && controller.isConnectedToExternalChargingSource) {
+    startTimer(remindCharging);
   }
   %orig;
 }

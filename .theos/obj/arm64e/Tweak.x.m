@@ -44,9 +44,9 @@ static void removeBulletin() {
 #define _LOGOS_RETURN_RETAINED
 #endif
 
-@class SBUIFlashlightController; @class BBBulletin; @class SBUIController; @class BBServer; @class PCSimpleTimer; 
+@class BBServer; @class SBUIController; @class PCSimpleTimer; @class SBUIFlashlightController; @class BBBulletin; 
 static void (*_logos_orig$_ungrouped$SBUIController$playChargingChimeIfAppropriate)(_LOGOS_SELF_TYPE_NORMAL SBUIController* _LOGOS_SELF_CONST, SEL); static void _logos_method$_ungrouped$SBUIController$playChargingChimeIfAppropriate(_LOGOS_SELF_TYPE_NORMAL SBUIController* _LOGOS_SELF_CONST, SEL); static void (*_logos_orig$_ungrouped$SBUIFlashlightController$turnFlashlightOnForReason$)(_LOGOS_SELF_TYPE_NORMAL SBUIFlashlightController* _LOGOS_SELF_CONST, SEL, id); static void _logos_method$_ungrouped$SBUIFlashlightController$turnFlashlightOnForReason$(_LOGOS_SELF_TYPE_NORMAL SBUIFlashlightController* _LOGOS_SELF_CONST, SEL, id); static void (*_logos_orig$_ungrouped$SBUIFlashlightController$turnFlashlightOffForReason$)(_LOGOS_SELF_TYPE_NORMAL SBUIFlashlightController* _LOGOS_SELF_CONST, SEL, id); static void _logos_method$_ungrouped$SBUIFlashlightController$turnFlashlightOffForReason$(_LOGOS_SELF_TYPE_NORMAL SBUIFlashlightController* _LOGOS_SELF_CONST, SEL, id); static BBServer* (*_logos_orig$_ungrouped$BBServer$initWithQueue$)(_LOGOS_SELF_TYPE_INIT BBServer*, SEL, id) _LOGOS_RETURN_RETAINED; static BBServer* _logos_method$_ungrouped$BBServer$initWithQueue$(_LOGOS_SELF_TYPE_INIT BBServer*, SEL, id) _LOGOS_RETURN_RETAINED; static id (*_logos_orig$_ungrouped$BBBulletin$responseForAction$)(_LOGOS_SELF_TYPE_NORMAL BBBulletin* _LOGOS_SELF_CONST, SEL, BBAction *); static id _logos_method$_ungrouped$BBBulletin$responseForAction$(_LOGOS_SELF_TYPE_NORMAL BBBulletin* _LOGOS_SELF_CONST, SEL, BBAction *); 
-static __inline__ __attribute__((always_inline)) __attribute__((unused)) Class _logos_static_class_lookup$PCSimpleTimer(void) { static Class _klass; if(!_klass) { _klass = objc_getClass("PCSimpleTimer"); } return _klass; }static __inline__ __attribute__((always_inline)) __attribute__((unused)) Class _logos_static_class_lookup$SBUIFlashlightController(void) { static Class _klass; if(!_klass) { _klass = objc_getClass("SBUIFlashlightController"); } return _klass; }
+static __inline__ __attribute__((always_inline)) __attribute__((unused)) Class _logos_static_class_lookup$SBUIFlashlightController(void) { static Class _klass; if(!_klass) { _klass = objc_getClass("SBUIFlashlightController"); } return _klass; }static __inline__ __attribute__((always_inline)) __attribute__((unused)) Class _logos_static_class_lookup$SBUIController(void) { static Class _klass; if(!_klass) { _klass = objc_getClass("SBUIController"); } return _klass; }static __inline__ __attribute__((always_inline)) __attribute__((unused)) Class _logos_static_class_lookup$PCSimpleTimer(void) { static Class _klass; if(!_klass) { _klass = objc_getClass("PCSimpleTimer"); } return _klass; }
 #line 25 "Tweak.x"
 static void sendNotif() {
   if (!autooff && remind) {
@@ -111,10 +111,14 @@ static void _logos_method$_ungrouped$SBUIController$playChargingChimeIfAppropria
 
 
 static void _logos_method$_ungrouped$SBUIFlashlightController$turnFlashlightOnForReason$(_LOGOS_SELF_TYPE_NORMAL SBUIFlashlightController* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd, id arg1) {
+  SBUIController *controller = [_logos_static_class_lookup$SBUIController() sharedInstance];
   if (!autooff) {
     startTimer(remind);
   } else {
     startTimer(autooffTimer);
+  }
+  if (charging && controller.isConnectedToExternalChargingSource) {
+    startTimer(remindCharging);
   }
   _logos_orig$_ungrouped$SBUIFlashlightController$turnFlashlightOnForReason$(self, _cmd, arg1);
 }
@@ -145,7 +149,7 @@ static id _logos_method$_ungrouped$BBBulletin$responseForAction$(_LOGOS_SELF_TYP
 }
 
 
-static __attribute__((constructor)) void _logosLocalCtor_60a54890(int __unused argc, char __unused **argv, char __unused **envp) {
+static __attribute__((constructor)) void _logosLocalCtor_443d4de9(int __unused argc, char __unused **argv, char __unused **envp) {
   NSMutableDictionary *prefs = [NSMutableDictionary dictionaryWithContentsOfFile:@"/User/Library/Preferences/com.greg0109.flashnotifyprefs.plist"];
   enabled = prefs[@"enabled"] ? [prefs[@"enabled"] boolValue] : YES;
   remind = prefs[@"remind"] ? [prefs[@"remind"] integerValue] : 120;

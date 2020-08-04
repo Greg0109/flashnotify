@@ -5,6 +5,18 @@
 	<key>items</key>
 	<array>
 		<dict>
+	    <key>cell</key>
+	    <string>PSStaticTextCell</string>
+	    <key>cellClass</key>
+	    <string>PFHeaderCell</string>
+	    <key>background</key>
+	    <string>#00FFFFFF</string>
+	    <key>image</key>
+	    <string>/Library/PreferenceBundles/FlashNotify.bundle/header.png</string>
+	    <key>height</key>
+	    <integer>250</integer>
+		</dict>
+		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 		</dict>
@@ -146,6 +158,32 @@
                 <string>900</string>
             </array>
         </dict>
+				<dict>
+					<key>cell</key>
+					<string>PSGroupCell</string>
+					<key>label</key>
+					<string>Credits</string>
+				</dict>
+				<dict>
+						<key>action</key>
+						<string>nada1</string>
+						<key>cell</key>
+						<string>PSButtonCell</string>
+						<key>icon</key>
+						<string>placeholderdev</string>
+						<key>label</key>
+						<string>Greg0109 - Developer</string>
+				</dict>
+				<dict>
+					<key>action</key>
+					<string>nada2</string>
+					<key>cell</key>
+					<string>PSButtonCell</string>
+					<key>icon</key>
+					<string>pfp</string>
+					<key>label</key>
+					<string>Thomas Jadallah - Designer</string>
+				</dict>
 	</array>
 	<key>title</key>
 	<string>FlashNotify</string>
