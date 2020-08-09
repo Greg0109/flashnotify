@@ -27,7 +27,7 @@ static void sendNotif() {
     BBBulletinRequest *bulletin = [[BBBulletinRequest alloc] init];
     bulletin.header = @"FLASHNOTIFY";
     bulletin.title = @"Your flashlight is still on";
-    bulletin.message = @"Would you like to turn it off?";
+    bulletin.message = @"Tap here to turn it off";
     bulletin.sectionID = @"com.apple.Preferences";
     bulletin.bulletinID = [[NSProcessInfo processInfo] globallyUniqueString];
     bulletin.recordID = [[NSProcessInfo processInfo] globallyUniqueString];

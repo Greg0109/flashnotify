@@ -44,16 +44,16 @@ static void removeBulletin() {
 #define _LOGOS_RETURN_RETAINED
 #endif
 
-@class PCSimpleTimer; @class SBUIFlashlightController; @class BBBulletin; @class SBUIController; @class BBServer; 
+@class SBUIController; @class BBServer; @class PCSimpleTimer; @class BBBulletin; @class SBUIFlashlightController; 
 static void (*_logos_orig$_ungrouped$SBUIController$playChargingChimeIfAppropriate)(_LOGOS_SELF_TYPE_NORMAL SBUIController* _LOGOS_SELF_CONST, SEL); static void _logos_method$_ungrouped$SBUIController$playChargingChimeIfAppropriate(_LOGOS_SELF_TYPE_NORMAL SBUIController* _LOGOS_SELF_CONST, SEL); static void (*_logos_orig$_ungrouped$SBUIFlashlightController$turnFlashlightOnForReason$)(_LOGOS_SELF_TYPE_NORMAL SBUIFlashlightController* _LOGOS_SELF_CONST, SEL, id); static void _logos_method$_ungrouped$SBUIFlashlightController$turnFlashlightOnForReason$(_LOGOS_SELF_TYPE_NORMAL SBUIFlashlightController* _LOGOS_SELF_CONST, SEL, id); static void (*_logos_orig$_ungrouped$SBUIFlashlightController$turnFlashlightOffForReason$)(_LOGOS_SELF_TYPE_NORMAL SBUIFlashlightController* _LOGOS_SELF_CONST, SEL, id); static void _logos_method$_ungrouped$SBUIFlashlightController$turnFlashlightOffForReason$(_LOGOS_SELF_TYPE_NORMAL SBUIFlashlightController* _LOGOS_SELF_CONST, SEL, id); static BBServer* (*_logos_orig$_ungrouped$BBServer$initWithQueue$)(_LOGOS_SELF_TYPE_INIT BBServer*, SEL, id) _LOGOS_RETURN_RETAINED; static BBServer* _logos_method$_ungrouped$BBServer$initWithQueue$(_LOGOS_SELF_TYPE_INIT BBServer*, SEL, id) _LOGOS_RETURN_RETAINED; static id (*_logos_orig$_ungrouped$BBBulletin$responseForAction$)(_LOGOS_SELF_TYPE_NORMAL BBBulletin* _LOGOS_SELF_CONST, SEL, BBAction *); static id _logos_method$_ungrouped$BBBulletin$responseForAction$(_LOGOS_SELF_TYPE_NORMAL BBBulletin* _LOGOS_SELF_CONST, SEL, BBAction *); 
-static __inline__ __attribute__((always_inline)) __attribute__((unused)) Class _logos_static_class_lookup$SBUIController(void) { static Class _klass; if(!_klass) { _klass = objc_getClass("SBUIController"); } return _klass; }static __inline__ __attribute__((always_inline)) __attribute__((unused)) Class _logos_static_class_lookup$SBUIFlashlightController(void) { static Class _klass; if(!_klass) { _klass = objc_getClass("SBUIFlashlightController"); } return _klass; }static __inline__ __attribute__((always_inline)) __attribute__((unused)) Class _logos_static_class_lookup$PCSimpleTimer(void) { static Class _klass; if(!_klass) { _klass = objc_getClass("PCSimpleTimer"); } return _klass; }
+static __inline__ __attribute__((always_inline)) __attribute__((unused)) Class _logos_static_class_lookup$PCSimpleTimer(void) { static Class _klass; if(!_klass) { _klass = objc_getClass("PCSimpleTimer"); } return _klass; }static __inline__ __attribute__((always_inline)) __attribute__((unused)) Class _logos_static_class_lookup$SBUIFlashlightController(void) { static Class _klass; if(!_klass) { _klass = objc_getClass("SBUIFlashlightController"); } return _klass; }static __inline__ __attribute__((always_inline)) __attribute__((unused)) Class _logos_static_class_lookup$SBUIController(void) { static Class _klass; if(!_klass) { _klass = objc_getClass("SBUIController"); } return _klass; }
 #line 25 "Tweak.x"
 static void sendNotif() {
   if (!autooff && remind) {
     BBBulletinRequest *bulletin = [[BBBulletinRequest alloc] init];
     bulletin.header = @"FLASHNOTIFY";
     bulletin.title = @"Your flashlight is still on";
-    bulletin.message = @"Would you like to turn it off?";
+    bulletin.message = @"Tap here to turn it off";
     bulletin.sectionID = @"com.apple.Preferences";
     bulletin.bulletinID = [[NSProcessInfo processInfo] globallyUniqueString];
     bulletin.recordID = [[NSProcessInfo processInfo] globallyUniqueString];
